@@ -25,7 +25,7 @@ resource "aws_elb" "elb" {
   }
 }
 
-resource "aws_route53_record" "www" {
+resource "aws_route53_record" "a_record" {
   zone_id = module.acs.route53_zone
   name    = var.dns-name
   type    = "A"
@@ -37,7 +37,7 @@ resource "aws_route53_record" "www" {
   }
 }
 
-resource "aws_route53_record" "www" {
+resource "aws_route53_record" "aaaa_record" {
   zone_id = module.acs.route53_zone
   name    = var.dns-name
   type    = "AAAA"
