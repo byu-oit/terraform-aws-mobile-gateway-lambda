@@ -27,7 +27,7 @@ variable "timeout" {
 }
 
 variable "dns-name" {
-  type = list
+  type = string
 }
 
 variable "api-description" {
