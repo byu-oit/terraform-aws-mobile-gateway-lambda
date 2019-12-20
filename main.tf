@@ -1,6 +1,6 @@
 //TODO: maybe move to single repo using github pages
 module "acs" {
-  source = "github.com/byu-oit/terraform-aws-acs-info.git?ref=v1.0.5"
+  source = "github.com/byu-oit/terraform-aws-acs-info.git?ref=v1.0.4"
   env = var.env
   vpc_vpn_to_campus = true
 }
