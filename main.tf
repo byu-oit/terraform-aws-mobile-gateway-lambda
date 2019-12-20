@@ -26,26 +26,24 @@ resource "aws_elb" "elb" {
 }
 
 resource "aws_route53_record" "a_record" {
-  zone_id = module.acs.route53_zone
-  name    = var.dns-name
-  type    = "A"
-
+  name = "${var.dns-name}.${module.acs.route53_zone.name}"
+  type = "A"
+  zone_id = module.acs.route53_zone.id
   alias {
-    name                   = "${aws_elb.elb.dns_name}"
-    zone_id                = "${aws_elb.elb.zone_id}"
     evaluate_target_health = false
+    name = aws_elb.elb.name
+    zone_id = aws_elb.elb.zone_id
   }
 }
 
 resource "aws_route53_record" "aaaa_record" {
-  zone_id = module.acs.route53_zone
-  name    = var.dns-name
-  type    = "AAAA"
-
+  name = "${var.dns-name}.${module.acs.route53_zone.name}"
+  type = "AAAA"
+  zone_id = module.acs.route53_zone.id
   alias {
-    name                   = "${aws_elb.elb.dns_name}"
-    zone_id                = "${aws_elb.elb.zone_id}"
     evaluate_target_health = false
+    name = aws_elb.elb.name
+    zone_id = aws_elb.elb.zone_id
   }
 }
 
