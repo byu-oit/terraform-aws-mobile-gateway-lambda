@@ -109,6 +109,6 @@ resource aws_lambda_function "lambda" {
   timeout = var.timeout
   vpc_config {
     security_group_ids = ["${aws_security_group.vpc_sec.id}"]
-    subnet_ids = module.acs.private_subnets
+    subnet_ids = module.acs.private_subnet_ids
   }
 }
