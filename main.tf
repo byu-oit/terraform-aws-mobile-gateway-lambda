@@ -21,7 +21,7 @@ resource "aws_elb" "elb" {
     instance_protocol = "https"
     lb_port           = 443
     lb_protocol       = "https"
-    ssl_certificate_id = module.acs.certificate
+    ssl_certificate_id = module.acs.certificate.id
   }
 }
 
