@@ -37,3 +37,7 @@ variable "api-description" {
 variable "env" {
   type = string
 }
+
+variable "account-id" {
+  type = string
+}
