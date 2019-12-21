@@ -31,33 +31,6 @@ resource "aws_api_gateway_integration" "integration" {
   uri                     = aws_lambda_function.lambda.invoke_arn
 }
 
-resource aws_iam_policy "ec2-network-interface-policy" {
-  name = "${var.app-name}-ec2"
-  description = "A policy to allow create, describe, and delete network interfaces"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-        "Effect": "Allow",
-        "Action": [
-            "ec2:CreateNetworkInterface",
-            "ec2:DescribeNetworkInterfaces",
-            "ec2:DeleteNetworkInterface"
-        ],
-        "Resource": "*"
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "ec2-network-interface-policy-attachment" {
-  role = aws_iam_role.iam_for_lambda.name
-  policy_arn = aws_iam_policy.ec2-network-interface-policy.arn
-}
-
 resource "aws_lambda_permission" "apigw_lambda" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
@@ -103,7 +76,7 @@ resource "aws_route53_record" "a_record" {
 
 resource "aws_iam_role" "iam_for_lambda" {
   name = "iam_for_lambda"
-
+  permissions_boundary = "arn:aws:iam::${var.account-id}:policy/iamRolePermissionBoundary"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -119,6 +92,33 @@ resource "aws_iam_role" "iam_for_lambda" {
   ]
 }
 EOF
+}
+
+resource aws_iam_policy "ec2-network-interface-policy" {
+  name = "${var.app-name}-ec2"
+  description = "A policy to allow create, describe, and delete network interfaces"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+        "Effect": "Allow",
+        "Action": [
+            "ec2:CreateNetworkInterface",
+            "ec2:DescribeNetworkInterfaces",
+            "ec2:DeleteNetworkInterface"
+        ],
+        "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ec2-network-interface-policy-attachment" {
+  role = aws_iam_role.iam_for_lambda.name
+  policy_arn = aws_iam_policy.ec2-network-interface-policy.arn
 }
 
 resource "aws_security_group" "vpc_sec" {
