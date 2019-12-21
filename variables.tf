@@ -41,3 +41,7 @@ variable "env" {
 variable "account-id" {
   type = string
 }
+
+data "aws_ssm_parameter" "us-east-1-cert" {
+  name = "/acs/acm/us-east-1/zone-cert-arn"
+}
