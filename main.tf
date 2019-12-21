@@ -46,7 +46,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
 
 
 resource "aws_api_gateway_domain_name" "api_domain" {
-  certificate_arn = data.aws_ssm_parameter.us-east-1-cert.value
+  certificate_arn = "${data.aws_ssm_parameter.us-east-1-cert.arn}"
   domain_name     = "${var.dns-name}.${module.acs.route53_zone.zone_id}"
 }
 
