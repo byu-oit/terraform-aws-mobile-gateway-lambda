@@ -22,22 +22,22 @@ resource "aws_lambda_permission" "apigw_lambda" {
 
 
 
-//resource "aws_api_gateway_domain_name" "api_domain" {
-//  certificate_arn = "${data.aws_ssm_parameter.us-east-1-cert.arn}"
-//  domain_name     = "${var.dns-name}.${module.acs.route53_zone.zone_id}"
-//}
-//
-//resource "aws_route53_record" "a_record" {
-//  name    = aws_api_gateway_domain_name.api_domain.domain_name
-//  type    = "A"
-//  zone_id = module.acs.route53_zone.zone_id
-//
-//  alias {
-//    evaluate_target_health = true
-//    name                   = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
-//    zone_id                = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
-//  }
-//}
+resource "aws_api_gateway_domain_name" "api_domain" {
+  certificate_arn = "${data.aws_ssm_parameter.us-east-1-cert.arn}"
+  domain_name     = "${var.dns-name}.${module.acs.route53_zone.zone_name}"
+}
+
+resource "aws_route53_record" "a_record" {
+  name    = aws_api_gateway_domain_name.api_domain.domain_name
+  type    = "A"
+  zone_id = module.acs.route53_zone.zone_id
+
+  alias {
+    evaluate_target_health = true
+    name                   = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
+    zone_id                = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
+  }
+}
 //
 //resource "aws_route53_record" "aaaa_record" {
 //  name    = aws_api_gateway_domain_name.api_domain.domain_name
