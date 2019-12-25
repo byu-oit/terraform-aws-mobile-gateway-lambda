@@ -42,6 +42,10 @@ variable "account-id" {
   type = string
 }
 
+variable "method-paths" {
+  type = list
+}
+
 data "aws_ssm_parameter" "us-east-1-cert" {
   name = "/acs/acm/us-east-1/zone-cert-arn"
 }

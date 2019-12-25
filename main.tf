@@ -5,9 +5,28 @@ module "acs" {
   vpc_vpn_to_campus = true
 }
 
-//output "test" {
-//  value = data.aws_ssm_parameter.us-east-1-cert
-//}
+resource "aws_api_gateway_resource" "resource" {
+  count = "${length(var.method-paths)}"
+  path_part   = "${var.method-paths[count.index]}"
+  parent_id   = module.api_gateway_and_lambda.api.root_resource_id
+  rest_api_id = module.api_gateway_and_lambda.api.id
+}
+
+resource "aws_api_gateway_method" "method" {
+  rest_api_id   = module.api_gateway_and_lambda.api.id
+  resource_id   = aws_api_gateway_resource.resource.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "integration" {
+  rest_api_id             = module.api_gateway_and_lambda.api.id
+  resource_id             = aws_api_gateway_resource.resource.id
+  http_method             = aws_api_gateway_method.method.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = module.api_gateway_and_lambda.lambda.invoke_arn
+}
 
 resource "aws_api_gateway_rest_api" "api" {
   name = "${var.app-name}-api"
