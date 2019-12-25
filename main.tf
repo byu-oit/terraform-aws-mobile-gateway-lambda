@@ -5,6 +5,10 @@ module "acs" {
   vpc_vpn_to_campus = true
 }
 
+//output "test" {
+//  value = data.aws_ssm_parameter.us-east-1-cert
+//}
+
 resource "aws_api_gateway_rest_api" "api" {
   name = "${var.app-name}-api"
 }
@@ -18,9 +22,8 @@ resource "aws_lambda_permission" "apigw_lambda" {
   source_arn = "arn:aws:execute-api:us-west-2:${var.account-id}:${aws_api_gateway_rest_api.api.id}/*"
 }
 
-
 resource "aws_api_gateway_domain_name" "api_domain" {
-  certificate_arn = "${data.aws_ssm_parameter.us-east-1-cert.arn}"
+  certificate_arn = "${data.aws_ssm_parameter.us-east-1-cert.value}"
   domain_name     = "${var.dns-name}.${substr(module.acs.route53_zone.name, 0, length(module.acs.route53_zone.name)-1)}"
 }
 
