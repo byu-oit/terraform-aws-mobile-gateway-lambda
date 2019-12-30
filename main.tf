@@ -11,7 +11,7 @@ resource "aws_api_gateway_rest_api" "api" {
 
 # Create only if root-resource is not empty
 resource "aws_api_gateway_method" "root_method" {
-  count = "${var.root-resource-name != "false" ? 1 : 0}"
+  count = "${var.root-resource != false ? 1 : 0}"
 
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
   resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"

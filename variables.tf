@@ -46,9 +46,8 @@ variable "method-paths" {
   type = list
 }
 
-variable "root-resource-name" {
-  type = string
-  default = "false"
+variable "root-resource" {
+  default = false
 }
 
 variable "root-resource-method" {
