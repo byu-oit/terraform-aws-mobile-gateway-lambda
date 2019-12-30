@@ -17,6 +17,8 @@ resource "aws_api_gateway_method" "root_method" {
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = var.root-resource-method
   authorization = "NONE"
+  request_parameters = var.root-resource-request-params
+
 }
 
 resource "aws_api_gateway_integration" "root_method_integration" {
@@ -43,7 +45,7 @@ resource "aws_api_gateway_method" "method" {
   resource_id   = "${aws_api_gateway_resource.resource[count.index].id}"
   http_method   = "GET"
   authorization = "NONE"
-  request_parameters = var.root-resource-request-params
+  request_parameters = var.resource-request-params
 }
 
 resource "aws_api_gateway_integration" "integration" {
