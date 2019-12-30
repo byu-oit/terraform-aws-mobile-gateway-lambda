@@ -5,11 +5,18 @@ module "acs" {
   vpc_vpn_to_campus = true
 }
 
-resource "aws_api_gateway_resource" "resource" {
-  count = "${length(var.method-paths)}"
-  path_part   = "${var.method-paths[count.index]}"
-  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
-  rest_api_id = aws_api_gateway_rest_api.api.id
+resource "aws_api_gateway_rest_api" "api" {
+  name = "${var.app-name}-api"
+}
+
+# Create only if root-resource is not empty
+resource "aws_api_gateway_method" "root_method" {
+  count = "${var.root-resource-name != "false" ? 1 : 0}"
+
+  rest_api_id = "${aws_api_gateway_rest_api.api.id}"
+  resource_id = "${aws_api_gateway_rest_api.api.root_resource_id}"
+  http_method = var.root-resource-method
+  authorization = "NONE"
 }
 
 resource "aws_api_gateway_method" "method" {
@@ -20,6 +27,15 @@ resource "aws_api_gateway_method" "method" {
   authorization = "NONE"
 }
 
+resource "aws_api_gateway_resource" "resource" {
+  count = "${length(var.method-paths)}"
+  path_part   = "${var.method-paths[count.index]}"
+  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  rest_api_id = aws_api_gateway_rest_api.api.id
+}
+
+
+
 resource "aws_api_gateway_integration" "integration" {
   count = "${length(var.method-paths)}"
   rest_api_id             = aws_api_gateway_rest_api.api.id
@@ -28,10 +44,6 @@ resource "aws_api_gateway_integration" "integration" {
   integration_http_method = "POST"
   type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.lambda.invoke_arn
-}
-
-resource "aws_api_gateway_rest_api" "api" {
-  name = "${var.app-name}-api"
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {
