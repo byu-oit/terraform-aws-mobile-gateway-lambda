@@ -43,9 +43,7 @@ resource "aws_api_gateway_method" "method" {
   resource_id   = "${aws_api_gateway_resource.resource[count.index].id}"
   http_method   = "GET"
   authorization = "NONE"
-  request_parameters {
-    "method.request.querystring.actor" = true
-  }
+  request_parameters = var.root-resource-request-params
 }
 
 resource "aws_api_gateway_integration" "integration" {

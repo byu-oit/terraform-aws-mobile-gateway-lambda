@@ -55,6 +55,11 @@ variable "root-resource-method" {
   default = ""
 }
 
+variable "root-resource-request-params" {
+  type = map
+  default = {}
+}
+
 data "aws_ssm_parameter" "us-east-1-cert" {
   name = "/acs/acm/us-east-1/zone-cert-arn"
 }
