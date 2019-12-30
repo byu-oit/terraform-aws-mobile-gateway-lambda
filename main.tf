@@ -43,6 +43,9 @@ resource "aws_api_gateway_method" "method" {
   resource_id   = "${aws_api_gateway_resource.resource[count.index].id}"
   http_method   = "GET"
   authorization = "NONE"
+  request_parameters {
+    "method.request.querystring.actor" = true
+  }
 }
 
 resource "aws_api_gateway_integration" "integration" {
@@ -65,7 +68,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
 }
 
 resource "aws_api_gateway_domain_name" "api_domain" {
-  certificate_arn = "${data.aws_ssm_parameter.us-east-1-cert.value}"
+  certificate_arn = data.aws_ssm_parameter.us-east-1-cert.value
   domain_name     = "${var.dns-name}.${substr(module.acs.route53_zone.name, 0, length(module.acs.route53_zone.name)-1)}"
 }
 
