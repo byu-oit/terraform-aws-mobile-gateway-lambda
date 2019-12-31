@@ -44,6 +44,7 @@ variable "account-id" {
 
 variable "method-paths" {
   type = list
+  default = []
 }
 
 variable "root-resource" {

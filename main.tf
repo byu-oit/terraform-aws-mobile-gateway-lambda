@@ -78,20 +78,8 @@ resource "aws_api_gateway_domain_name" "api_domain" {
   domain_name     = "${var.dns-name}.${substr(module.acs.route53_zone.name, 0, length(module.acs.route53_zone.name)-1)}"
 }
 
-resource "aws_route53_record" "a_record" {
-  name    = aws_api_gateway_domain_name.api_domain.domain_name
-  type    = "A"
-  zone_id = module.acs.route53_zone.zone_id
-
-  alias {
-    evaluate_target_health = true
-    name                   = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
-    zone_id                = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
-  }
-}
-
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda"
+  name = "${var.app-name}-lambda"
   permissions_boundary = "arn:aws:iam::${var.account-id}:policy/iamRolePermissionBoundary"
   assume_role_policy = <<EOF
 {
