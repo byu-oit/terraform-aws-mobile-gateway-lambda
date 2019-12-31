@@ -65,6 +65,21 @@ variable "resource-request-params" {
   default = {}
 }
 
+variable "lambda-environment-variables" {
+  type = map
+  default = {}
+}
+
+variable "resource-authorization" {
+  type = string
+  default = "NONE"
+}
+
+variable "root-resource-authorization" {
+  type = string
+  default = "NONE"
+}
+
 data "aws_ssm_parameter" "us-east-1-cert" {
   name = "/acs/acm/us-east-1/zone-cert-arn"
 }

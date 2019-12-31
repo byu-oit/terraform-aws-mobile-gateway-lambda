@@ -9,6 +9,12 @@ resource "aws_api_gateway_rest_api" "api" {
   name = "${var.app-name}-api"
 }
 
+resource "aws_api_gateway_deployment" "stage" {
+  depends_on  = ["aws_api_gateway_integration.root_method_integration", "aws_api_gateway_integration.integration"]
+  rest_api_id = "${aws_api_gateway_rest_api.api.id}"
+  stage_name  = var.env
+}
+
 # Create only if root-resource is not empty
 resource "aws_api_gateway_method" "root_method" {
   count = "${var.root-resource == true ? 1 : 0}"
@@ -16,7 +22,7 @@ resource "aws_api_gateway_method" "root_method" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
   http_method = var.root-resource-method
-  authorization = "NONE"
+  authorization = var.root-resource-authorization
   request_parameters = var.root-resource-request-params
 
 }
@@ -44,7 +50,7 @@ resource "aws_api_gateway_method" "method" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = "${aws_api_gateway_resource.resource[count.index].id}"
   http_method   = "GET"
-  authorization = "NONE"
+  authorization = var.resource-authorization
   request_parameters = var.resource-request-params
 }
 
@@ -83,18 +89,6 @@ resource "aws_route53_record" "a_record" {
     zone_id                = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
   }
 }
-//
-//resource "aws_route53_record" "aaaa_record" {
-//  name    = aws_api_gateway_domain_name.api_domain.domain_name
-//  type    = "AAAA"
-//  zone_id = module.acs.route53_zone.zone_id
-//
-//  alias {
-//    evaluate_target_health = false
-//    name                   = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
-//    zone_id                = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
-//  }
-//}
 
 resource "aws_iam_role" "iam_for_lambda" {
   name = "iam_for_lambda"
@@ -179,5 +173,8 @@ resource aws_lambda_function "lambda" {
   vpc_config {
     security_group_ids = ["${aws_security_group.vpc_sec.id}"]
     subnet_ids = module.acs.private_subnet_ids
+  }
+  environment {
+    variables = var.lambda-environment-variables
   }
 }
