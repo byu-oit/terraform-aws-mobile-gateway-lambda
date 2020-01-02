@@ -2,7 +2,7 @@ output "lambda_role" {
   value = aws_iam_role.iam_for_lambda
 }
 
-output "api_gateway" {
+output "api" {
   value = aws_api_gateway_rest_api.api
 }
 
