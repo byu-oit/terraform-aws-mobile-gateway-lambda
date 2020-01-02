@@ -49,7 +49,7 @@ resource "aws_api_gateway_method" "method" {
   count = "${length(var.method-paths)}"
   rest_api_id   = aws_api_gateway_rest_api.api.id
   resource_id   = "${aws_api_gateway_resource.resource[count.index].id}"
-  http_method   = "GET"
+  http_method   = "${var.method-types[count.index]}"
   authorization = var.resource-authorization
   request_parameters = var.resource-request-params
 }

@@ -47,6 +47,11 @@ variable "method-paths" {
   default = []
 }
 
+variable "method-types" {
+  type = list
+  default = []
+}
+
 variable "root-resource" {
   default = false
 }
