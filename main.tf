@@ -10,9 +10,12 @@ resource "aws_api_gateway_rest_api" "api" {
 }
 
 resource "aws_api_gateway_deployment" "stage" {
-  depends_on  = ["aws_api_gateway_integration.root_method_integration", "aws_api_gateway_integration.integration"]
+  depends_on = [
+    "aws_api_gateway_integration.root_method_integration",
+    "aws_api_gateway_integration.integration"
+  ]
   rest_api_id = "${aws_api_gateway_rest_api.api.id}"
-  stage_name  = var.env
+  stage_name = var.env
 }
 
 # Create only if root-resource is not empty
@@ -30,63 +33,63 @@ resource "aws_api_gateway_method" "root_method" {
 resource "aws_api_gateway_integration" "root_method_integration" {
   count = "${var.root-resource == true ? 1 : 0}"
 
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = aws_api_gateway_rest_api.api.root_resource_id
-  http_method             = var.root-resource-method
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = aws_api_gateway_rest_api.api.root_resource_id
+  http_method = var.root-resource-method
   integration_http_method = var.root-resource-method
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambda.invoke_arn
+  type = "AWS_PROXY"
+  uri = aws_lambda_function.lambda.invoke_arn
 }
 
 resource "aws_api_gateway_resource" "resource" {
   count = "${length(var.method-paths)}"
-  path_part   = "${var.method-paths[count.index]}"
-  parent_id   = aws_api_gateway_rest_api.api.root_resource_id
+  path_part = "${var.method-paths[count.index]}"
+  parent_id = aws_api_gateway_rest_api.api.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.api.id
 }
 
 resource "aws_api_gateway_method" "method" {
   count = "${length(var.method-paths)}"
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = "${aws_api_gateway_resource.resource[count.index].id}"
-  http_method   = "${var.method-types[count.index]}"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = "${aws_api_gateway_resource.resource[count.index].id}"
+  http_method = "${var.method-types[count.index]}"
   authorization = var.resource-authorization
   request_parameters = var.resource-request-params
 }
 
 resource "aws_api_gateway_integration" "integration" {
   count = "${length(var.method-paths)}"
-  rest_api_id             = aws_api_gateway_rest_api.api.id
-  resource_id             = "${aws_api_gateway_resource.resource[count.index].id}"
-  http_method             = "${aws_api_gateway_method.method[count.index].http_method}"
+  rest_api_id = aws_api_gateway_rest_api.api.id
+  resource_id = "${aws_api_gateway_resource.resource[count.index].id}"
+  http_method = "${aws_api_gateway_method.method[count.index].http_method}"
   integration_http_method = "POST"
-  type                    = "AWS_PROXY"
-  uri                     = aws_lambda_function.lambda.invoke_arn
+  type = "AWS_PROXY"
+  uri = aws_lambda_function.lambda.invoke_arn
 }
 
 resource "aws_lambda_permission" "apigw_lambda" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
+  statement_id = "AllowExecutionFromAPIGateway"
+  action = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda.function_name
-  principal     = "apigateway.amazonaws.com"
+  principal = "apigateway.amazonaws.com"
 
   source_arn = "arn:aws:execute-api:us-west-2:${var.account-id}:${aws_api_gateway_rest_api.api.id}/*"
 }
 
 resource "aws_api_gateway_domain_name" "api_domain" {
   certificate_arn = data.aws_ssm_parameter.us-east-1-cert.value
-  domain_name     = "${var.dns-name}.${substr(module.acs.route53_zone.name, 0, length(module.acs.route53_zone.name)-1)}"
+  domain_name = "${var.dns-name}.${substr(module.acs.route53_zone.name, 0, length(module.acs.route53_zone.name)-1)}"
 }
 
 resource "aws_route53_record" "a_record" {
-  name    = aws_api_gateway_domain_name.api_domain.domain_name
-  type    = "A"
+  name = aws_api_gateway_domain_name.api_domain.domain_name
+  type = "A"
   zone_id = module.acs.route53_zone.zone_id
 
   alias {
     evaluate_target_health = true
-    name                   = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
-    zone_id                = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
+    name = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
+    zone_id = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
   }
 }
 
@@ -153,7 +156,9 @@ resource "aws_security_group" "vpc_sec" {
     from_port = 0
     protocol = "-1"
     to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
   }
 
   lifecycle {
@@ -171,7 +176,8 @@ resource aws_lambda_function "lambda" {
   runtime = var.runtime
   timeout = var.timeout
   vpc_config {
-    security_group_ids = ["${aws_security_group.vpc_sec.id}"]
+    security_group_ids = [
+      "${aws_security_group.vpc_sec.id}"]
     subnet_ids = module.acs.private_subnet_ids
   }
   environment {
