@@ -74,8 +74,18 @@ resource "aws_lambda_permission" "apigw_lambda" {
 }
 
 resource "aws_api_gateway_domain_name" "api_domain" {
-  certificate_arn = data.aws_ssm_parameter.us-east-1-cert.value
   domain_name = "${var.dns-name}.${substr(module.acs.route53_zone.name, 0, length(module.acs.route53_zone.name)-1)}"
+  regional_certificate_arn = module.acs.certificate.arn
+
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
+
+resource "aws_api_gateway_base_path_mapping" "path_mapping" {
+  api_id      = aws_api_gateway_rest_api.api.id
+  stage_name  = aws_api_gateway_deployment.stage.stage_name
+  domain_name = aws_api_gateway_domain_name.api_domain.domain_name
 }
 
 resource "aws_route53_record" "a_record" {
@@ -84,9 +94,9 @@ resource "aws_route53_record" "a_record" {
   zone_id = module.acs.route53_zone.zone_id
 
   alias {
-    evaluate_target_health = true
-    name = aws_api_gateway_domain_name.api_domain.cloudfront_domain_name
-    zone_id = aws_api_gateway_domain_name.api_domain.cloudfront_zone_id
+    evaluate_target_health = false
+    name = aws_api_gateway_domain_name.api_domain.regional_domain_name
+    zone_id = aws_api_gateway_domain_name.api_domain.regional_zone_id
   }
 }
 
