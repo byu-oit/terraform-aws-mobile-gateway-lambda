@@ -43,12 +43,12 @@ variable "account-id" {
 }
 
 variable "method-paths" {
-  type = list
+  type = list(string)
   default = []
 }
 
 variable "method-types" {
-  type = list
+  type = list(string)
   default = []
 }
 
@@ -62,17 +62,17 @@ variable "root-resource-method" {
 }
 
 variable "root-resource-request-params" {
-  type = map
+  type = map(string)
   default = {}
 }
 
 variable "resource-request-params" {
-  type = map
+  type = map(string)
   default = {}
 }
 
 variable "lambda-environment-variables" {
-  type = map
+  type = map(string)
   default = {}
 }
 
@@ -84,6 +84,10 @@ variable "resource-authorization" {
 variable "root-resource-authorization" {
   type = string
   default = "NONE"
+}
+
+variable "swagger-path" {
+  type = string
 }
 
 data "aws_ssm_parameter" "us-east-1-cert" {

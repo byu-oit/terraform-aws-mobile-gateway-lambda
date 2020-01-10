@@ -10,17 +10,14 @@ resource "aws_api_gateway_rest_api" "api" {
 }
 
 resource "aws_api_gateway_deployment" "stage" {
-  depends_on = [
-    aws_api_gateway_integration.root_method_integration,
-    aws_api_gateway_integration.integration
-  ]
-  rest_api_id = "${aws_api_gateway_rest_api.api.id}"
+  rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name = var.env
+  stage_description = md5(file(var.swagger-path))
 }
 
 # Create only if root-resource is not empty
 resource "aws_api_gateway_method" "root_method" {
-  count = "${var.root-resource == true ? 1 : 0}"
+  count = var.root-resource == true ? 1 : 0
 
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
@@ -31,7 +28,7 @@ resource "aws_api_gateway_method" "root_method" {
 }
 
 resource "aws_api_gateway_integration" "root_method_integration" {
-  count = "${var.root-resource == true ? 1 : 0}"
+  count = var.root-resource == true ? 1 : 0
 
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_rest_api.api.root_resource_id
@@ -42,26 +39,26 @@ resource "aws_api_gateway_integration" "root_method_integration" {
 }
 
 resource "aws_api_gateway_resource" "resource" {
-  count = "${length(var.method-paths)}"
-  path_part = "${var.method-paths[count.index]}"
+  count = length(var.method-paths)
+  path_part = var.method-paths[count.index]
   parent_id = aws_api_gateway_rest_api.api.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.api.id
 }
 
 resource "aws_api_gateway_method" "method" {
-  count = "${length(var.method-paths)}"
+  count = length(var.method-paths)
   rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = "${aws_api_gateway_resource.resource[count.index].id}"
-  http_method = "${var.method-types[count.index]}"
+  resource_id = aws_api_gateway_resource.resource[count.index].id
+  http_method = var.method-types[count.index]
   authorization = var.resource-authorization
   request_parameters = var.resource-request-params
 }
 
 resource "aws_api_gateway_integration" "integration" {
-  count = "${length(var.method-paths)}"
+  count = length(var.method-paths)
   rest_api_id = aws_api_gateway_rest_api.api.id
-  resource_id = "${aws_api_gateway_resource.resource[count.index].id}"
-  http_method = "${aws_api_gateway_method.method[count.index].http_method}"
+  resource_id = aws_api_gateway_resource.resource[count.index].id
+  http_method = aws_api_gateway_method.method[count.index].http_method
   integration_http_method = "POST"
   type = "AWS_PROXY"
   uri = aws_lambda_function.lambda.invoke_arn
@@ -177,7 +174,7 @@ resource aws_lambda_function "lambda" {
   timeout = var.timeout
   vpc_config {
     security_group_ids = [
-      "${aws_security_group.vpc_sec.id}"]
+      aws_security_group.vpc_sec.id]
     subnet_ids = module.acs.private_subnet_ids
   }
   environment {
