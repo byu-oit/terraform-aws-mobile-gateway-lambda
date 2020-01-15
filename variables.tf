@@ -42,14 +42,11 @@ variable "account-id" {
   type = string
 }
 
-variable "method-paths" {
-  type = list(string)
-  default = []
-}
-
-variable "method-types" {
-  type = list(string)
-  default = []
+variable "methods" {
+  type = list(object({
+    path = string
+    type = string
+  }))
 }
 
 variable "root-resource" {

@@ -118,23 +118,23 @@ resource "aws_api_gateway_integration" "root_method_integration" {
 }
 
 resource "aws_api_gateway_resource" "resource" {
-  count = length(var.method-paths)
-  path_part = var.method-paths[count.index]
+  count = length(var.methods)
+  path_part = var.methods[count.index].path
   parent_id = aws_api_gateway_rest_api.api.root_resource_id
   rest_api_id = aws_api_gateway_rest_api.api.id
 }
 
 resource "aws_api_gateway_method" "method" {
-  count = length(var.method-paths)
+  count = length(var.methods)
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_resource.resource[count.index].id
-  http_method = var.method-types[count.index]
+  http_method = var.methods[count.index].type
   authorization = var.resource-authorization
   request_parameters = var.resource-request-params
 }
 
 resource "aws_api_gateway_integration" "integration" {
-  count = length(var.method-paths)
+  count = length(var.methods)
   rest_api_id = aws_api_gateway_rest_api.api.id
   resource_id = aws_api_gateway_resource.resource[count.index].id
   http_method = aws_api_gateway_method.method[count.index].http_method
