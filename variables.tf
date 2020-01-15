@@ -47,6 +47,7 @@ variable "methods" {
     path = string
     type = string
   }))
+  default = []
 }
 
 variable "root-resource" {
