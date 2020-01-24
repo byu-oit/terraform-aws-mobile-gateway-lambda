@@ -216,8 +216,9 @@ resource aws_lambda_function "lambda" {
   runtime = var.runtime
   timeout = var.timeout
   vpc_config {
-    security_group_ids = [
-      aws_security_group.vpc_sec.id]
+    security_group_ids = concat([
+      aws_security_group.vpc_sec.id,
+    ], var.lambda-security-group-ids)
     subnet_ids = module.acs.private_subnet_ids
   }
   environment {

@@ -87,3 +87,8 @@ variable "root-resource-authorization" {
 variable "swagger-path" {
   type = string
 }
+
+variable "lambda-security-group-ids" {
+  type = list(string)
+  default = []
+}
