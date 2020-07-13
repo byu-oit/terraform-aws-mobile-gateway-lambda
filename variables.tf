@@ -42,13 +42,11 @@ variable "account-id" {
   type = string
 }
 
-variable "method-paths" {
-  type = list(string)
-  default = []
-}
-
-variable "method-types" {
-  type = list(string)
+variable "methods" {
+  type = list(object({
+    path = string
+    type = string
+  }))
   default = []
 }
 
@@ -88,4 +86,9 @@ variable "root-resource-authorization" {
 
 variable "swagger-path" {
   type = string
+}
+
+variable "lambda-security-group-ids" {
+  type = list(string)
+  default = []
 }
