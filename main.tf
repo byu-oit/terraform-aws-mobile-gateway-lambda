@@ -1,4 +1,3 @@
-//TODO: maybe move to single repo using github pages
 module "acs" {
   source = "github.com/byu-oit/terraform-aws-acs-info.git?ref=v2.1.0"
   vpc_vpn_to_campus = true
@@ -147,9 +146,8 @@ resource "aws_lambda_permission" "apigw_lambda" {
   action = "lambda:InvokeFunction"
   function_name = aws_lambda_function.lambda.function_name
   principal = "apigateway.amazonaws.com"
-  source_arn = "arn:aws:execute-api:us-west-2:${var.account-id}:${aws_api_gateway_rest_api.api.id}/*"
+  source_arn = aws_api_gateway_rest_api.api.execution_arn
   depends_on    = [aws_iam_role_policy_attachment.lambda_logs, aws_cloudwatch_log_group.logs]
-
 }
 
 resource "aws_api_gateway_domain_name" "api_domain" {
