@@ -90,6 +90,12 @@ resource "aws_api_gateway_deployment" "stage" {
   rest_api_id = aws_api_gateway_rest_api.api.id
   stage_name = var.env
   stage_description = md5(file(var.swagger-path))
+	depends_on = [
+		aws_api_gateway_method.root_method,
+		aws_api_gateway_integration.root_method_integration,
+		aws_api_gateway_method.method,
+		aws_api_gateway_integration.integration
+	]
 }
 
 # Create only if root-resource is not empty
