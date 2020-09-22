@@ -157,7 +157,7 @@ resource "aws_lambda_permission" "apigw_lambda" {
 }
 
 resource "aws_api_gateway_domain_name" "api_domain" {
-  domain_name = "${var.dns-name}.${substr(module.acs.route53_zone.name, 0, length(module.acs.route53_zone.name)-1)}"
+  domain_name = "${var.dns-name}.${module.acs.route53_zone.name}"
   regional_certificate_arn = module.acs.certificate.arn
 
   endpoint_configuration {
